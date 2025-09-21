@@ -50,6 +50,11 @@ All colors MUST be HSL.
     
     --shadow-card: 0 4px 20px -2px hsl(220 13% 18% / 0.1);
     --shadow-hero: 0 20px 40px -12px hsl(158 68% 42% / 0.3);
+    --shadow-glow: 0 0 40px hsl(158 68% 42% / 0.2);
+    
+    /* 3D Transform utilities */
+    --transform-card: perspective(1000px) rotateX(0deg) rotateY(0deg);
+    --transform-card-hover: perspective(1000px) rotateX(-2deg) rotateY(5deg) translateZ(20px);
 
     --radius: 0.5rem;
 
@@ -113,6 +118,11 @@ All colors MUST be HSL.
     
     --shadow-card: 0 4px 20px -2px hsl(0 0% 0% / 0.3);
     --shadow-hero: 0 20px 40px -12px hsl(158 68% 42% / 0.4);
+    --shadow-glow: 0 0 40px hsl(158 68% 42% / 0.3);
+    
+    /* Dark 3D Transform utilities */
+    --transform-card: perspective(1000px) rotateX(0deg) rotateY(0deg);
+    --transform-card-hover: perspective(1000px) rotateX(-2deg) rotateY(5deg) translateZ(20px);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -131,5 +141,28 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply backdrop-blur-xl bg-white/10 border border-white/20;
+  }
+  
+  .hover-3d {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: var(--transform-card);
+  }
+  
+  .hover-3d:hover {
+    transform: var(--transform-card-hover);
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .parallax-bg {
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
   }
 }
