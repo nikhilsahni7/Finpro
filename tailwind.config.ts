@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -48,14 +52,10 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         brand: {
-          emerald: "hsl(var(--brand-emerald))",
-          "emerald-light": "hsl(var(--brand-emerald-light))",
-          "emerald-dark": "hsl(var(--brand-emerald-dark))",
-        },
-        stat: {
-          dark: "hsl(var(--stat-dark))",
-          blue: "hsl(var(--stat-blue))",
-          green: "hsl(var(--stat-green))",
+          blue: "hsl(var(--brand-blue))",
+          "blue-light": "hsl(var(--brand-blue-light))",
+          "blue-dark": "hsl(var(--brand-blue-dark))",
+          navy: "hsl(var(--brand-navy))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
