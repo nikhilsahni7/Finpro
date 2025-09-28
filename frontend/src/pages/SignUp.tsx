@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { createRegistrationRequest } from "@/lib/api";
 import {
   ArrowRight,
   CheckCircle,
@@ -25,19 +26,32 @@ const SignUp = () => {
     name: "",
     email: "",
     phone: "",
+    state: "",
+    requested_searches: 100,
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup request logic here
-    console.log("Access request submitted:", formData);
-    setIsSubmitted(true);
+    setError(null);
+    try {
+      await createRegistrationRequest({
+        name: formData.name,
+        email: formData.email,
+        phone_number: formData.phone,
+        state: formData.state,
+        requested_searches: Number(formData.requested_searches) || 100,
+      });
+      setIsSubmitted(true);
+    } catch (err: any) {
+      setError(err?.message || "Failed to submit request");
+    }
   };
 
   if (isSubmitted) {
@@ -67,7 +81,7 @@ const SignUp = () => {
                   Request Submitted!
                 </CardTitle>
                 <CardDescription className="text-muted-foreground text-base">
-                  Your access request has been sent to our admin team
+                  Please verify your email from the link we've sent you
                 </CardDescription>
               </CardHeader>
 
@@ -82,59 +96,16 @@ const SignUp = () => {
                       <li className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                         <span>
-                          Our admin team will review your request within 24-48
-                          hours
+                          After verifying your email, our admin team will review
+                          your request
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>
-                          You'll receive an email with your account credentials
-                          if approved
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>
-                          You can then sign in and start using FINPRO
-                          immediately
-                        </span>
+                        <span>You'll receive credentials if approved</span>
                       </li>
                     </ul>
                   </div>
-
-                  <div className="bg-gradient-to-r from-blue-50 to-blue-50/50 rounded-xl p-4 border border-blue-200">
-                    <p className="text-sm text-blue-800">
-                      <span className="font-semibold">Reference ID:</span> #
-                      {Math.random().toString(36).substr(2, 9).toUpperCase()}
-                    </p>
-                    <p className="text-xs text-blue-600 mt-1">
-                      Save this ID for future reference
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <Link to="/signin">
-                    <Button variant="hero" size="lg" className="w-full group">
-                      <span className="group-hover:scale-110 transition-transform duration-300">
-                        Go to Sign In
-                      </span>
-                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                    </Button>
-                  </Link>
-
-                  <Link to="/">
-                    <Button
-                      variant="hero-outline"
-                      size="lg"
-                      className="w-full group"
-                    >
-                      <span className="group-hover:scale-110 transition-transform duration-300">
-                        Back to Home
-                      </span>
-                    </Button>
-                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -158,229 +129,156 @@ const SignUp = () => {
         </Link>
       </div>
 
-      {/* Main Content - Horizontal Layout */}
-      <div className="flex items-center justify-center px-8 lg:px-16 xl:px-24 pb-12">
-        <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left Side - Welcome Content */}
-          <div className="space-y-8 animate-slide-up">
-            <div className="space-y-6">
-              <h1 className="text-4xl lg:text-5xl font-bold leading-tight text-brand-navy">
-                Join FINPRO
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-blue-light">
-                  Elite Network
-                </span>
-              </h1>
-              <p className="text-muted-foreground text-lg leading-relaxed max-w-xl">
-                Request access to our exclusive platform and join thousands of
-                professionals who trust FINPRO for critical data insights.
-              </p>
-            </div>
-
-            {/* Features List */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-brand-blue rounded-full"></div>
-                <span className="text-muted-foreground">
-                  Admin-approved access for verified professionals
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-brand-blue rounded-full"></div>
-                <span className="text-muted-foreground">
-                  Enterprise-grade security and compliance
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-brand-blue rounded-full"></div>
-                <span className="text-muted-foreground">
-                  Instant access upon approval
-                </span>
-              </div>
-            </div>
-
-            {/* Admin Note */}
-            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-200">
-              <p className="text-sm text-yellow-800">
-                <span className="font-semibold">Note:</span> All access requests
-                are manually reviewed by our admin team to ensure platform
-                security and quality.
-              </p>
-            </div>
-          </div>
-
-          {/* Right Side - Sign Up Form */}
-          <div className="w-full max-w-md mx-auto animate-scale-in">
-            <Card className="shadow-2xl hover:shadow-3xl transition-all duration-500 border-0 bg-white/95 backdrop-blur-md">
-              <CardHeader className="text-center space-y-4 pb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-brand-blue to-brand-blue-dark rounded-2xl flex items-center justify-center mx-auto shadow-lg animate-glow-pulse">
-                  <UserPlus className="w-8 h-8 text-white" />
+      {/* Main Content */}
+      <div className="flex items-start justify-center px-8 lg:px-16 xl:px-24 pb-12">
+        <div className="w-full max-w-4xl grid lg:grid-cols-2 gap-8">
+          <div className="lg:sticky lg:top-8 space-y-6">
+            <Card className="shadow-xl border border-border/60 bg-white/90 backdrop-blur-md animate-slide-up">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <UserPlus className="w-6 h-6 text-brand-blue" />
+                  <CardTitle className="text-2xl font-bold text-brand-navy">
+                    Request Access
+                  </CardTitle>
                 </div>
-                <CardTitle className="text-3xl font-bold text-brand-navy">
-                  Request Access
-                </CardTitle>
-                <CardDescription className="text-muted-foreground text-base">
-                  Submit your details to get access to FINPRO
+                <CardDescription>
+                  Fill out your details to request access to FINPRO
                 </CardDescription>
               </CardHeader>
-
-              <CardContent className="space-y-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Name Field */}
-                  <div
-                    className="space-y-2 animate-fade-in"
-                    style={{ animationDelay: "0.1s" }}
-                  >
-                    <Label
-                      htmlFor="name"
-                      className="text-brand-navy font-medium flex items-center gap-2"
-                    >
-                      <User className="w-4 h-4" />
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-brand-navy">
                       Full Name
                     </Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                      className="h-12 rounded-xl border-2 border-border focus:border-brand-blue transition-all duration-300 hover:border-brand-blue/50 bg-background/50"
-                    />
-                  </div>
-
-                  {/* Email Field */}
-                  <div
-                    className="space-y-2 animate-fade-in"
-                    style={{ animationDelay: "0.2s" }}
-                  >
-                    <Label
-                      htmlFor="email"
-                      className="text-brand-navy font-medium flex items-center gap-2"
-                    >
-                      <Mail className="w-4 h-4" />
-                      Email Address
-                    </Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="Enter your email address"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      className="h-12 rounded-xl border-2 border-border focus:border-brand-blue transition-all duration-300 hover:border-brand-blue/50 bg-background/50"
-                    />
-                  </div>
-
-                  {/* Phone Field */}
-                  <div
-                    className="space-y-2 animate-fade-in"
-                    style={{ animationDelay: "0.3s" }}
-                  >
-                    <Label
-                      htmlFor="phone"
-                      className="text-brand-navy font-medium flex items-center gap-2"
-                    >
-                      <Phone className="w-4 h-4" />
-                      Phone Number
-                    </Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      placeholder="Enter your phone number"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required
-                      className="h-12 rounded-xl border-2 border-border focus:border-brand-blue transition-all duration-300 hover:border-brand-blue/50 bg-background/50"
-                    />
-                  </div>
-
-                  {/* Terms and Conditions */}
-                  <div
-                    className="animate-fade-in"
-                    style={{ animationDelay: "0.4s" }}
-                  >
-                    <div className="bg-gradient-to-r from-muted/50 to-muted/30 rounded-xl p-4 border border-border/50">
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        By submitting this request, you agree to our{" "}
-                        <Link
-                          to="/terms"
-                          className="text-brand-blue hover:text-brand-blue-dark transition-colors duration-300"
-                        >
-                          Terms of Service
-                        </Link>{" "}
-                        and{" "}
-                        <Link
-                          to="/privacy"
-                          className="text-brand-blue hover:text-brand-blue-dark transition-colors duration-300"
-                        >
-                          Privacy Policy
-                        </Link>
-                        . Your information will be reviewed by our admin team
-                        for approval.
-                      </p>
+                    <div className="relative">
+                      <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="name"
+                        name="name"
+                        placeholder="Enter your full name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                        className="pl-9 h-12 rounded-xl border-2 border-border focus:border-brand-blue transition-all duration-300 hover:border-brand-blue/50 bg-background/50"
+                      />
                     </div>
                   </div>
 
-                  {/* Submit Button */}
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-brand-navy">
+                      Email Address
+                    </Label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        className="pl-9 h-12 rounded-xl border-2 border-border focus:border-brand-blue transition-all duration-300 hover:border-brand-blue/50 bg-background/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-brand-navy">
+                      Phone Number
+                    </Label>
+                    <div className="relative">
+                      <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="phone"
+                        name="phone"
+                        placeholder="Enter your phone number"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        required
+                        className="pl-9 h-12 rounded-xl border-2 border-border focus:border-brand-blue transition-all duration-300 hover:border-brand-blue/50 bg-background/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="state" className="text-brand-navy">
+                      State
+                    </Label>
+                    <Input
+                      id="state"
+                      name="state"
+                      placeholder="State"
+                      value={formData.state}
+                      onChange={handleInputChange}
+                      className="h-12 rounded-xl border-2 border-border focus:border-brand-blue transition-all duration-300 hover:border-brand-blue/50 bg-background/50"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="requested_searches"
+                      className="text-brand-navy"
+                    >
+                      Requested Searches per Day
+                    </Label>
+                    <Input
+                      id="requested_searches"
+                      name="requested_searches"
+                      type="number"
+                      min={1}
+                      max={10000}
+                      value={formData.requested_searches}
+                      onChange={handleInputChange}
+                      className="h-12 rounded-xl border-2 border-border focus:border-brand-blue transition-all duration-300 hover:border-brand-blue/50 bg-background/50"
+                    />
+                  </div>
+
+                  {error && <div className="text-sm text-red-600">{error}</div>}
+
                   <Button
                     type="submit"
                     variant="hero"
                     size="lg"
-                    className="w-full animate-fade-in group"
-                    style={{ animationDelay: "0.5s" }}
+                    className="w-full group"
                   >
                     <span className="group-hover:scale-110 transition-transform duration-300">
-                      Submit Access Request
+                      Submit Request
                     </span>
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </form>
+              </CardContent>
+            </Card>
+          </div>
 
-                {/* Divider */}
-                <div
-                  className="relative my-6 animate-fade-in"
-                  style={{ animationDelay: "0.6s" }}
-                >
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white px-2 text-muted-foreground">
-                      Already have an account?
-                    </span>
-                  </div>
+          {/* Right Side - Benefits */}
+          <div className="space-y-6">
+            <Card className="shadow-xl border border-border/60 bg-white/90 backdrop-blur-md animate-slide-up">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <User className="w-6 h-6 text-brand-blue" />
+                  <CardTitle className="text-2xl font-bold text-brand-navy">
+                    Why Join FINPRO?
+                  </CardTitle>
                 </div>
-
-                {/* Sign In Link */}
-                <div
-                  className="text-center animate-fade-in"
-                  style={{ animationDelay: "0.7s" }}
-                >
-                  <Link to="/signin">
-                    <Button
-                      variant="hero-outline"
-                      size="lg"
-                      className="w-full group"
-                    >
-                      <span className="group-hover:scale-110 transition-transform duration-300">
-                        Sign In
-                      </span>
-                    </Button>
-                  </Link>
+                <CardDescription>
+                  Gain access to powerful search across millions of records
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-brand-blue rounded-full"></div>
+                  <span className="text-muted-foreground">
+                    Request custom daily search limits
+                  </span>
                 </div>
-
-                {/* Footer */}
-                <div
-                  className="text-center pt-6 animate-fade-in"
-                  style={{ animationDelay: "0.8s" }}
-                >
-                  <p className="text-xs text-muted-foreground">
-                    Secure and confidential registration process
-                  </p>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-brand-blue rounded-full"></div>
+                  <span className="text-muted-foreground">
+                    Get access after admin approval
+                  </span>
                 </div>
               </CardContent>
             </Card>

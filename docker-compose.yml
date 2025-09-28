@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    container_name: finpro-postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=finpro
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: finpro-api
+    environment:
+      - PG_DSN=postgres://postgres:postgres@postgres:5432/finpro?sslmode=disable
+      - CH_ADDR=${CH_ADDR}
+      - CH_DATABASE=${CH_DATABASE:-finpro}
+      - CH_USERNAME=${CH_USERNAME}
+      - CH_PASSWORD=${CH_PASSWORD}
+      - CH_TLS=${CH_TLS:-false}
+      - CH_PROTOCOL=${CH_PROTOCOL:-native}
+      - UPLOADS_DIR=/data/uploads
+      # Auth and email configuration
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-http://localhost:8080}
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      - postgres
+
+volumes:
+  pg_data:
+  uploads:

@@ -1,0 +1,9 @@
+# Go
+bin/
+build/
+*.log
+*.out
+
+# Upload temp
+uploads/
+**/uploads/

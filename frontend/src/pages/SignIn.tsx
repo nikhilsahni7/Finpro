@@ -8,17 +8,20 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { login } from "@/lib/api";
 import { ArrowRight, Eye, EyeOff, LogIn, Shield } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignIn = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     captcha: "",
   });
+  const [error, setError] = useState<string | null>(null);
 
   // Simple captcha generation (for demo purposes)
   const [captcha] = useState(() => {
@@ -34,10 +37,34 @@ const SignIn = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signin logic here
-    console.log("Sign in attempt:", formData);
+    setError(null);
+    try {
+      if (formData.captcha !== captcha) {
+        setError("Invalid security code");
+        return;
+      }
+      const data = await login(formData.email, formData.password);
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("auth_user", JSON.stringify(data.user));
+      localStorage.setItem("auth_expires", data.expiresAt);
+      navigate("/user/dashboard");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // If backend returned device limit with sessions
+      if (err?.status === 409 && err?.data?.sessions?.length) {
+        navigate("/device-conflict", {
+          state: {
+            email: formData.email,
+            password: formData.password,
+            sessions: err.data.sessions,
+          },
+        });
+        return;
+      }
+      setError(err?.message || "Invalid email or password");
+    }
   };
 
   return (
@@ -185,7 +212,7 @@ const SignIn = () => {
                       Security Verification
                     </Label>
                     <div className="space-y-3">
-                      <div className="bg-gradient-to-r from-muted to-muted/50 rounded-xl p-4 border-2 border-dashed border-border">
+                      <div className="bg-gradient-to-r from-muted to muted/50 rounded-xl p-4 border-2 border-dashed border-border">
                         <div className="text-center">
                           <p className="text-sm text-muted-foreground mb-2">
                             Enter the code below:
@@ -207,6 +234,8 @@ const SignIn = () => {
                       />
                     </div>
                   </div>
+
+                  {error && <div className="text-sm text-red-600">{error}</div>}
 
                   {/* Forgot Password */}
                   <div
