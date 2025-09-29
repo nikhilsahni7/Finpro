@@ -9,6 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { login } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import { ArrowRight, Eye, EyeOff, LogIn, Shield } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -32,6 +33,8 @@ const SignIn = () => {
     ).join("");
   });
 
+  const { setUser } = useAuth();
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -49,8 +52,9 @@ const SignIn = () => {
       localStorage.setItem("auth_token", data.token);
       localStorage.setItem("auth_user", JSON.stringify(data.user));
       localStorage.setItem("auth_expires", data.expiresAt);
+      setUser(data.user);
       navigate("/user/dashboard");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       // If backend returned device limit with sessions
       if (err?.status === 409 && err?.data?.sessions?.length) {

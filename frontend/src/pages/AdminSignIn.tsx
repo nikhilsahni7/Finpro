@@ -9,12 +9,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { login } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const AdminSignIn = () => {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +32,7 @@ const AdminSignIn = () => {
         localStorage.setItem("auth_token", data.token);
         localStorage.setItem("auth_user", JSON.stringify(data.user));
         localStorage.setItem("auth_expires", data.expiresAt);
+        setUser(data.user);
         navigate("/admin/dashboard");
       } else {
         setError("Not an admin account");

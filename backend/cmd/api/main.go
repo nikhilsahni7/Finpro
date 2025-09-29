@@ -10,12 +10,21 @@ import (
 	"finpro/internal/ch"
 	"finpro/internal/db"
 	"finpro/internal/server"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load env from multiple likely locations (ignore errors if not present)
+	_ = godotenv.Load(".env")
+	_ = godotenv.Load("../.env")
+	_ = godotenv.Load("../../.env")
+	_ = godotenv.Load("backend/.env")
+	_ = godotenv.Load("../backend/.env")
+
 	ctx := context.Background()
 
-	pgDsn := getenv("PG_DSN", "postgres://postgres:postgres@localhost:5432/finpro?sslmode=disable")
+	pgDsn := getenv("PG_DSN", "postgresql://postgres:finpro123@db.ngoiuldsdnhmzmahnncz.supabase.co:5432/postgres")
 	chAddr := getenv("CH_ADDR", "localhost:9000")
 	chDatabase := getenv("CH_DATABASE", "finpro")
 	chUser := os.Getenv("CH_USERNAME")

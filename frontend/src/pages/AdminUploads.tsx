@@ -10,8 +10,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { listUploads, uploadCsv, type UploadRecord } from "@/lib/api";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const AdminUploads = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -19,20 +20,35 @@ const AdminUploads = () => {
   const [uploads, setUploads] = useState<UploadRecord[]>([]);
   const [error, setError] = useState<string>("");
   const [q, setQ] = useState<string>("");
+  const intervalRef = useRef<number | null>(null);
+  const navigate = useNavigate();
+  const { clear } = useAuth();
 
   const refresh = async () => {
     try {
       const res = await listUploads();
-      setUploads(res.uploads);
+      const list = Array.isArray(res?.uploads) ? res.uploads : [];
+      setUploads(list);
     } catch (e: any) {
       setError(e?.message || "Failed to load uploads");
+      if (e?.status === 401 || e?.status === 403) {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        clear();
+        navigate("/admin/signin", { replace: true });
+      }
     }
   };
 
   useEffect(() => {
     void refresh();
-    const id = setInterval(refresh, 4000);
-    return () => clearInterval(id);
+    intervalRef.current = window.setInterval(refresh, 4000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    };
   }, []);
 
   const submit = async (e: React.FormEvent) => {

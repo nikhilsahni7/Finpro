@@ -1,14 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/lib/auth";
 import { Link, useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { clear } = useAuth();
   const doLogout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("auth_user");
     localStorage.removeItem("auth_expires");
-    navigate("/admin/signin");
+    clear();
+    navigate("/admin/signin", { replace: true });
   };
   return (
     <div className="min-h-screen p-6 space-y-4">

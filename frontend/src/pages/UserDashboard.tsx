@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-empty */
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,6 +18,7 @@ import {
   searchApi,
   type ContactRow,
 } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import { ArrowRight, RefreshCw, Search, SlidersHorizontal } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -91,6 +94,7 @@ const measure = async <T,>(fn: () => T | Promise<T>) => {
 
 const UserDashboard = () => {
   const navigate = useNavigate();
+  const { clear } = useAuth();
   const [me, setMe] = useState<{
     email: string;
     name: string;
@@ -153,7 +157,9 @@ const UserDashboard = () => {
           if (p.logic === "AND" || p.logic === "OR") setLogic(p.logic);
           setLastFromCache(true);
         }
-      } catch {}
+      } catch {
+        /* empty */
+      }
     })();
   }, []);
 
@@ -331,7 +337,8 @@ const UserDashboard = () => {
               size="sm"
               onClick={async () => {
                 await logout();
-                navigate("/signin");
+                clear();
+                navigate("/signin", { replace: true });
               }}
             >
               Logout
