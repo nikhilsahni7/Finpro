@@ -98,68 +98,36 @@ func tlsConfigFor(addr string) *tls.Config {
 	return &tls.Config{ServerName: host}
 }
 
-func openNativeTLS(ctx context.Context, addr, database, user, pass string) (ch.Conn, error) {
-	options := &ch.Options{
+func connectionOptions(addr, database, user, pass string, protocol ch.Protocol, tlsConf *tls.Config) *ch.Options {
+	return &ch.Options{
 		Addr:             []string{addr},
 		Auth:             ch.Auth{Database: database, Username: user, Password: pass},
 		Settings:         baseSettings(),
 		Compression:      &ch.Compression{Method: ch.CompressionLZ4},
-		DialTimeout:      10 * time.Second,
+		DialTimeout:      30 * time.Second, // increased
 		ConnOpenStrategy: ch.ConnOpenInOrder,
-		Protocol:         ch.Native,
-		TLS:              tlsConfigFor(addr),
-		MaxOpenConns:     20,
-		MaxIdleConns:     10,
-		ConnMaxLifetime:  60 * time.Minute,
+		Protocol:         protocol,
+		TLS:              tlsConf,
+
+		// Connection pool tuning
+		MaxOpenConns:    100, // increased
+		MaxIdleConns:    50,  // increased
+		ConnMaxLifetime: 60 * time.Minute,
 	}
-	return ch.Open(options)
+}
+
+func openNativeTLS(ctx context.Context, addr, database, user, pass string) (ch.Conn, error) {
+	return ch.Open(connectionOptions(addr, database, user, pass, ch.Native, tlsConfigFor(addr)))
 }
 
 func openHTTPS(ctx context.Context, addr, database, user, pass string) (ch.Conn, error) {
-	options := &ch.Options{
-		Addr:             []string{addr},
-		Auth:             ch.Auth{Database: database, Username: user, Password: pass},
-		Settings:         baseSettings(),
-		Compression:      &ch.Compression{Method: ch.CompressionLZ4},
-		DialTimeout:      10 * time.Second,
-		ConnOpenStrategy: ch.ConnOpenInOrder,
-		Protocol:         ch.HTTP,
-		TLS:              tlsConfigFor(addr),
-		MaxOpenConns:     20,
-		MaxIdleConns:     10,
-		ConnMaxLifetime:  60 * time.Minute,
-	}
-	return ch.Open(options)
+	return ch.Open(connectionOptions(addr, database, user, pass, ch.HTTP, tlsConfigFor(addr)))
 }
 
 func openNativePlain(ctx context.Context, addr, database, user, pass string) (ch.Conn, error) {
-	options := &ch.Options{
-		Addr:             []string{addr},
-		Auth:             ch.Auth{Database: database, Username: user, Password: pass},
-		Settings:         baseSettings(),
-		Compression:      &ch.Compression{Method: ch.CompressionLZ4},
-		DialTimeout:      10 * time.Second,
-		ConnOpenStrategy: ch.ConnOpenInOrder,
-		Protocol:         ch.Native,
-		MaxOpenConns:     20,
-		MaxIdleConns:     10,
-		ConnMaxLifetime:  60 * time.Minute,
-	}
-	return ch.Open(options)
+	return ch.Open(connectionOptions(addr, database, user, pass, ch.Native, nil))
 }
 
 func openHTTPPlain(ctx context.Context, addr, database, user, pass string) (ch.Conn, error) {
-	options := &ch.Options{
-		Addr:             []string{addr},
-		Auth:             ch.Auth{Database: database, Username: user, Password: pass},
-		Settings:         baseSettings(),
-		Compression:      &ch.Compression{Method: ch.CompressionLZ4},
-		DialTimeout:      10 * time.Second,
-		ConnOpenStrategy: ch.ConnOpenInOrder,
-		Protocol:         ch.HTTP,
-		MaxOpenConns:     20,
-		MaxIdleConns:     10,
-		ConnMaxLifetime:  60 * time.Minute,
-	}
-	return ch.Open(options)
+	return ch.Open(connectionOptions(addr, database, user, pass, ch.HTTP, nil))
 }
