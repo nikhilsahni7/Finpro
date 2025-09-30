@@ -8,7 +8,7 @@ const HeroSection = () => {
       <div className="w-full max-w-none px-8 lg:px-16 xl:px-24 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[60vh]">
           {/* Content */}
-          <div className="space-y-6 animate-slide-up">
+          <div className="space-y-6 animate-slide-up-fast opacity-0 [animation-delay:100ms]">
             <div className="space-y-4">
               <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-brand-navy">
                 Unlock Critical Insights
@@ -19,16 +19,10 @@ const HeroSection = () => {
                 <br />
                 Records, Instantly
               </h1>
-              <p
-                className="text-brand-blue font-semibold text-lg lg:text-xl animate-fade-in"
-                style={{ animationDelay: "0.2s" }}
-              >
+              <p className="text-brand-blue font-semibold text-lg lg:text-xl animate-fade-in-fast opacity-0 [animation-delay:200ms]">
                 Designed for the Modern Professional
               </p>
-              <p
-                className="text-muted-foreground text-base lg:text-lg leading-relaxed max-w-xl animate-fade-in"
-                style={{ animationDelay: "0.4s" }}
-              >
+              <p className="text-muted-foreground text-base lg:text-lg leading-relaxed max-w-xl animate-fade-in-fast opacity-0 [animation-delay:300ms]">
                 FINPRO delivers unparalleled access and precision across massive
                 datasets. Eight-second searching to find exactly what you need,
                 faster.
@@ -36,22 +30,18 @@ const HeroSection = () => {
             </div>
 
             {/* Enhanced CTA Buttons */}
-            <div
-              className="flex flex-col sm:flex-row gap-4 animate-fade-in"
-              style={{ animationDelay: "0.6s" }}
-            >
+            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-fast opacity-0 [animation-delay:400ms]">
               <Link to="/user/dashboard">
                 <Button
                   variant="hero"
                   size="lg"
-                  className="group font-medium text-lg px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 bg-gradient-to-r from-brand-blue to-brand-blue-dark hover:from-brand-blue-dark hover:to-brand-blue"
+                  className="group font-medium text-lg px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 bg-gradient-to-r from-brand-blue to-brand-blue-dark hover:from-brand-blue-dark hover:to-brand-blue"
                 >
-                  <span className="group-hover:scale-110 transition-transform duration-300">
+                  <span className="transition-transform duration-200 group-hover:scale-105">
                     Start Searching Now
                   </span>
-
                   <svg
-                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"
+                    className="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -68,10 +58,10 @@ const HeroSection = () => {
               <Button
                 variant="hero-outline"
                 size="lg"
-                className="group font-medium text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 border-2"
+                className="group font-medium text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-2"
               >
                 <svg
-                  className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300"
+                  className="w-5 h-5 mr-2 transition-transform duration-200 group-hover:scale-110"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -89,22 +79,16 @@ const HeroSection = () => {
           </div>
 
           {/* Hero Image */}
-          <div
-            className="relative animate-scale-in"
-            style={{ animationDelay: "0.8s" }}
-          >
-            <div className="relative group transform transition-all duration-700 hover:scale-102">
+          <div className="relative animate-scale-in-fast opacity-0 [animation-delay:200ms]">
+            <div className="relative group">
               <img
                 src={heroImage}
                 alt="Data extraction and analytics professional working with dashboards"
-                className="w-full h-auto object-contain transition-transform duration-1000 group-hover:scale-105 drop-shadow-2xl"
+                className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl"
               />
 
-              {/* Data Extraction overlay - positioned on monitor area */}
-              <div
-                className="absolute top-[15%] right-[8%] bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-xl border border-white/20 animate-bounce"
-                style={{ animationDuration: "3s", animationDelay: "1s" }}
-              >
+              {/* Data Extraction overlay */}
+              <div className="absolute top-[15%] right-[8%] bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-xl border border-white/20 animate-gentle-float">
                 <div className="text-brand-navy text-sm font-semibold">
                   Data Extraction
                 </div>
@@ -126,16 +110,16 @@ const HeroSection = () => {
                 </div>
               </div>
 
-              {/* Real-time Analytics overlay - positioned on desk area */}
-              <div className="absolute bottom-[12%] right-[15%] bg-brand-blue/90 backdrop-blur-md rounded-xl p-3 shadow-xl text-white animate-pulse">
+              {/* Real-time Analytics overlay */}
+              <div className="absolute bottom-[12%] right-[15%] bg-brand-blue/90 backdrop-blur-md rounded-xl p-3 shadow-xl text-white animate-subtle-pulse">
                 <div className="text-xs font-medium opacity-90">
                   Real-time Analytics
                 </div>
                 <div className="text-sm font-bold">40M+ Records</div>
               </div>
 
-              {/* Live Data Streaming overlay - positioned on left side data sources */}
-              <div className="absolute top-[35%] left-[12%] bg-green-500/90 backdrop-blur-md rounded-lg p-2 shadow-lg text-white animate-float">
+              {/* Live Data Streaming overlay */}
+              <div className="absolute top-[35%] left-[12%] bg-green-500/90 backdrop-blur-md rounded-lg p-2 shadow-lg text-white animate-gentle-float [animation-delay:1s]">
                 <div className="text-xs font-medium">Live Data</div>
                 <div className="text-xs font-mono">Streaming</div>
               </div>

@@ -125,7 +125,7 @@ const UserDashboard = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const pageSize = 50;
+  const pageSize = 100; // Increased from 50 to 100 for better UX
   const formRef = useRef<HTMLFormElement | null>(null);
   const tableScrollRef = useRef<HTMLDivElement | null>(null);
 
@@ -287,7 +287,8 @@ const UserDashboard = () => {
     );
   }, [withinFilter, rows]);
 
-  const totalResults = filteredWithin.length;
+  const displayedResults = filteredWithin.length;
+  const totalResults = total; // Total from database
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-background via-muted/30 to-background">
@@ -491,12 +492,12 @@ const UserDashboard = () => {
                   {/* Row 4 */}
                   <div className="space-y-1">
                     <Label htmlFor="companyPhone" className="text-brand-navy">
-                      Company Phone
+                      Alternate Number
                     </Label>
                     <Input
                       id="companyPhone"
                       name="companyPhone"
-                      placeholder="Enter company phone"
+                      placeholder="Enter alternate number"
                       value={form.companyPhone}
                       onChange={handleChange}
                       className="h-11 rounded-xl border-2 border-border focus:border-brand-blue bg-background/50"
@@ -617,9 +618,10 @@ const UserDashboard = () => {
                 <Card className="bg-muted/30 border">
                   <CardContent className="pt-4">
                     <div className="text-xs text-muted-foreground">
-                      Total Results
+                      Showing / Total Results
                     </div>
                     <div className="text-2xl font-bold text-brand-navy">
+                      {displayedResults.toLocaleString()} /{" "}
                       {totalResults.toLocaleString()}
                     </div>
                   </CardContent>
@@ -673,7 +675,14 @@ const UserDashboard = () => {
                 <div>
                   <CardTitle className="text-brand-navy">Results</CardTitle>
                   <CardDescription className="text-muted-foreground">
-                    Showing {totalResults.toLocaleString()} records
+                    {totalResults > 0 ? (
+                      <>
+                        Showing top {displayedResults.toLocaleString()} of{" "}
+                        {totalResults.toLocaleString()} total records
+                      </>
+                    ) : (
+                      "No results"
+                    )}
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
@@ -722,7 +731,7 @@ const UserDashboard = () => {
                       <th className="p-2 min-w-[150px]">LinkedIn</th>
                       <th className="p-2 min-w-[120px]">Position</th>
                       <th className="p-2 min-w-[120px]">Company</th>
-                      <th className="p-2 min-w-[120px]">Company Phone</th>
+                      <th className="p-2 min-w-[120px]">Alternate Number</th>
                       <th className="p-2 min-w-[120px]">Website</th>
                       <th className="p-2 min-w-[100px]">Domain</th>
                       <th className="p-2 min-w-[120px]">Facebook</th>
@@ -842,10 +851,13 @@ const UserDashboard = () => {
                   </tbody>
                 </table>
               </div>
-              {totalResults === 0 && (
+              {displayedResults === 0 && (
                 <div className="text-center text-muted-foreground py-10">
-                  No results found. Try changing your search or switching to{" "}
-                  {logic === "AND" ? "OR" : "AND"}.
+                  {totalResults > 0
+                    ? "No results match your filter. Clear the 'Search Within Results' box."
+                    : `No results found. Try changing your search or switching to ${
+                        logic === "AND" ? "OR" : "AND"
+                      }.`}
                 </div>
               )}
             </CardContent>

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -79,14 +80,14 @@ func ConnectClickHouse(ctx context.Context, addr, database, user, pass string) (
 
 func baseSettings() ch.Settings {
 	return ch.Settings{
-		"max_execution_time":                 30,
-		"allow_experimental_analyzer":        1,
-		"optimize_move_to_prewhere":          1,
-		"use_uncompressed_cache":             1,
-		"max_threads":                        4,
-		"max_memory_usage":                   "4000000000",
-		"join_algorithm":                     "hash",
-		"max_bytes_before_external_group_by": "1000000000",
+		"max_execution_time":                 getenvIntDefault("CH_MAX_EXECUTION_TIME", 30),
+		"allow_experimental_analyzer":        getenvIntDefault("CH_ALLOW_EXPERIMENTAL_ANALYZER", 1),
+		"optimize_move_to_prewhere":          getenvIntDefault("CH_OPTIMIZE_MOVE_TO_PREWHERE", 1),
+		"use_uncompressed_cache":             getenvIntDefault("CH_USE_UNCOMPRESSED_CACHE", 1),
+		"max_threads":                        getenvIntDefault("CH_MAX_THREADS", 4),
+		"max_memory_usage":                   getenvStringDefault("CH_MAX_MEMORY_USAGE", "4000000000"),
+		"join_algorithm":                     getenvStringDefault("CH_JOIN_ALGORITHM", "hash"),
+		"max_bytes_before_external_group_by": getenvStringDefault("CH_MAX_BYTES_BEFORE_EXTERNAL_GROUP_BY", "1000000000"),
 	}
 }
 
@@ -104,15 +105,15 @@ func connectionOptions(addr, database, user, pass string, protocol ch.Protocol, 
 		Auth:             ch.Auth{Database: database, Username: user, Password: pass},
 		Settings:         baseSettings(),
 		Compression:      &ch.Compression{Method: ch.CompressionLZ4},
-		DialTimeout:      30 * time.Second, // increased
+		DialTimeout:      getenvDurationDefault("CH_DIAL_TIMEOUT", 60*time.Second), // increased from 30s
 		ConnOpenStrategy: ch.ConnOpenInOrder,
 		Protocol:         protocol,
 		TLS:              tlsConf,
 
-		// Connection pool tuning
-		MaxOpenConns:    100, // increased
-		MaxIdleConns:    50,  // increased
-		ConnMaxLifetime: 60 * time.Minute,
+		// Connection pool tuning (configurable via env)
+		MaxOpenConns:    getenvIntDefault("CH_MAX_OPEN_CONNS", 200), // increased from 100
+		MaxIdleConns:    getenvIntDefault("CH_MAX_IDLE_CONNS", 100), // increased from 50
+		ConnMaxLifetime: getenvDurationDefault("CH_CONN_MAX_LIFETIME", 60*time.Minute),
 	}
 }
 
@@ -130,4 +131,34 @@ func openNativePlain(ctx context.Context, addr, database, user, pass string) (ch
 
 func openHTTPPlain(ctx context.Context, addr, database, user, pass string) (ch.Conn, error) {
 	return ch.Open(connectionOptions(addr, database, user, pass, ch.HTTP, nil))
+}
+
+func getenvIntDefault(k string, d int) int {
+	v := strings.TrimSpace(os.Getenv(k))
+	if v == "" {
+		return d
+	}
+	if n, err := strconv.Atoi(v); err == nil {
+		return n
+	}
+	return d
+}
+
+func getenvStringDefault(k, d string) string {
+	v := strings.TrimSpace(os.Getenv(k))
+	if v == "" {
+		return d
+	}
+	return v
+}
+
+func getenvDurationDefault(k string, d time.Duration) time.Duration {
+	v := strings.TrimSpace(os.Getenv(k))
+	if v == "" {
+		return d
+	}
+	if dur, err := time.ParseDuration(v); err == nil {
+		return dur
+	}
+	return d
 }
