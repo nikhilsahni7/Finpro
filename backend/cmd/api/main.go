@@ -19,12 +19,12 @@ func main() {
 	_ = godotenv.Load(".env")
 	_ = godotenv.Load("../.env")
 	_ = godotenv.Load("../../.env")
+	_ = godotenv.Load("../../../.env")
 	_ = godotenv.Load("backend/.env")
 	_ = godotenv.Load("../backend/.env")
-
 	ctx := context.Background()
 
-	pgDsn := getenv("PG_DSN", "postgresql://postgres:finpro123@db.ngoiuldsdnhmzmahnncz.supabase.co:5432/postgres")
+	pgDsn := os.Getenv("PG_DSN")
 	chAddr := getenv("CH_ADDR", "localhost:9000")
 	chDatabase := getenv("CH_DATABASE", "finpro")
 	chUser := os.Getenv("CH_USERNAME")
